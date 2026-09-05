@@ -1,0 +1,7 @@
+# Local Flutter build/test outputs are not part of the distributed package.
+build/
+.dart_tool/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
