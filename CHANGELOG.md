@@ -1,3 +1,8 @@
+## 0.3.1 - 2026-09-22
+
+- Require Flutter 3.47.0 or newer, matching the flutter_scene dependency's
+  minimum supported SDK.
+
 ## 0.3.0
 
 - Prepared the first pub.dev distribution with the ecosystem's Apache-2.0

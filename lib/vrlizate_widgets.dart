@@ -23,8 +23,8 @@
 /// - **World-locked actions**: [VrWorldActionPanel3D] presents information and
 ///   buttons at a stable spatial pose, with gaze, laser and joystick routing.
 ///
-/// Requires Flutter master channel (Flutter GPU) and
-/// `flutter config --enable-dart-data-assets`.
+/// Requires Flutter 3.47 or newer and a compatible Flutter GPU runtime.
+/// Follow the README and the installed flutter_scene setup instructions.
 library;
 
 export 'src/vr_controls.dart';

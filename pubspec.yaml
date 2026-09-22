@@ -1,7 +1,7 @@
 name: vrlizate_widgets
 description: Reusable 3D controls and world-anchored action panels for Flutter
   GPU scenes, with gaze, laser and gamepad focus routing.
-version: 0.3.0
+version: 0.3.1
 homepage: https://github.com/Open-Neom/vrlizate_widgets
 repository: https://github.com/Open-Neom/vrlizate_widgets
 issue_tracker: https://github.com/Open-Neom/vrlizate_widgets/issues
@@ -16,7 +16,7 @@ platforms:
 environment:
   sdk: ^3.10.0
   # Requires a runtime compatible with Flutter GPU and flutter_scene.
-  flutter: ">=3.44.0"
+  flutter: ">=3.47.0"
 
 dependencies:
   flutter:

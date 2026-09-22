@@ -32,13 +32,21 @@ dependencies:
   vrlizate_widgets: ^0.3.0
 ```
 
+Para distribuir versiones release en Windows o Linux se requiere Flutter
+3.47.1+ y activar Flutter GPU en el runner de la plataforma, según las
+[instrucciones de flutter_scene](https://pub.dev/packages/flutter_scene).
+
+Shipping Windows or Linux releases requires Flutter 3.47.1+ and Flutter GPU
+enabled in the platform runner; follow the
+[flutter_scene setup instructions](https://pub.dev/packages/flutter_scene).
+
 ## Integración local / Local integration
 
-El paquete requiere Dart 3.10+, Flutter 3.44+ y un runtime compatible con
+El paquete requiere Dart 3.10+, Flutter 3.47+ y un runtime compatible con
 Flutter GPU/Impeller y la versión de `flutter_scene` de [pubspec.yaml](pubspec.yaml).
 Desde un workspace con ambos paquetes en directorios hermanos:
 
-The package requires Dart 3.10+, Flutter 3.44+, and a runtime compatible with
+The package requires Dart 3.10+, Flutter 3.47+, and a runtime compatible with
 Flutter GPU/Impeller and the `flutter_scene` dependency in [pubspec.yaml](pubspec.yaml).
 For sibling packages in a local workspace:
 
