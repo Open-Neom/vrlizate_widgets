@@ -27,6 +27,8 @@
 /// Follow the README and the installed flutter_scene setup instructions.
 library;
 
+export 'src/vr_widget_surface.dart';
+
 export 'src/vr_controls.dart';
 export 'src/vr_advanced_controls.dart';
 export 'src/vr_widget.dart';

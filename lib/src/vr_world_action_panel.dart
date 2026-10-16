@@ -7,6 +7,7 @@ import 'package:vector_math/vector_math.dart' as vm;
 
 import 'vr_controls.dart';
 import 'vr_text.dart';
+import 'vr_widget_surface.dart';
 
 /// An immutable world-space basis for spatial UI.
 ///
@@ -334,6 +335,7 @@ class VrWorldActionPanel3D {
     double actionSpacing = 0.06,
     int columns = 1,
     double columnSpacing = 0.08,
+    VrWidgetSurface3D? content,
     VrControlMeshBuilder? meshBuilder,
     VrWorldTextNodeBuilder? textNodeBuilder,
   }) async {
@@ -353,11 +355,12 @@ class VrWorldActionPanel3D {
 
     final actionStride = buttonHeight + actionSpacing;
     final rows = (actions.length + columns - 1) ~/ columns;
-    final panelHeight = 0.60 + rows * actionStride;
+    final contentSpace = content == null ? 0.0 : content.worldHeight + .08;
+    final panelHeight = 0.60 + contentSpace + rows * actionStride;
     final top = panelHeight / 2;
     final gridWidth = width - 0.28;
     final buttonWidth = (gridWidth - columnSpacing * (columns - 1)) / columns;
-    final firstActionY = top - 0.52 - buttonHeight / 2;
+    final firstActionY = top - 0.52 - contentSpace - buttonHeight / 2;
 
     final root = Node(name: '${name}_world_panel_root')
       ..raycastable = false
@@ -383,6 +386,17 @@ class VrWorldActionPanel3D {
           ),
     )..raycastable = false;
     root.add(plate);
+
+    if (content != null) {
+      // WidgetComponent's quad already maps local +X to texture-left, matching
+      // this viewer-facing basis. Text sprites use a different geometry.
+      content.node.localTransform = vm.Matrix4.translationValues(
+        0,
+        top - .52 - content.worldHeight / 2,
+        .09,
+      );
+      root.add(content.node);
+    }
 
     final buttons = <VrButton3D>[];
     for (var i = 0; i < actions.length; i++) {
@@ -494,7 +508,7 @@ class VrWorldActionPanel3D {
       rootNode: root,
       plateNode: plate,
       buttons: buttons,
-      textNodes: textNodes,
+      textNodes: [...textNodes, if (content != null) content.node],
       actionTextNodes: actionTextNodes,
     );
   }

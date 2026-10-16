@@ -14,6 +14,7 @@ gamepad and budget phones.
 - `VrPanel3D`, `VrDragController`
 - `VrTextLabel`
 - `VrWorldActionPanel3D`, `VrWorldAction`, `VrWorldPose`
+- `VrWidgetSurface3D`: vistas Flutter proporcionales dentro del mundo 3D.
 
 Los controles compuestos usan primitivas pequeñas y cambian materiales o
 visibilidad durante la interacción. No reconstruyen ni vuelven a subir meshes
@@ -90,6 +91,29 @@ its nodes. `setValue` and `setSelectedIndex` restore persisted state without
 firing user callbacks.
 
 ## Panel fijo en el mundo / World-anchored panel
+
+`VrWidgetSurface3D` reutiliza widgets Flutter de presentación sin recrear sus
+servicios. Conserva la relación de aspecto, limita la altura y el coste de
+captura, y comparte una textura entre los ojos. Una tarjeta de 720 × 300 ocupa
+1.5 × 0.625 metros con los límites predeterminados. El contenido recibe input
+manual y queda sin foco ni eventos táctiles; las acciones se resuelven mediante
+el panel espacial. El anfitrión sigue siendo responsable de validar y retirar
+los datos privados al cambiar de sesión.
+
+```dart
+final surface = VrWidgetSurface3D(
+  name: 'profile_surface',
+  child: existingProfileCard,
+  logicalSize: const Size(720, 300),
+  availableWidth: 1.5,
+);
+// Pasar content: surface a VrWorldActionPanel3D.create(width: 1.78, ...).
+// Su nodo se posiciona encima de los botones y se retira con el panel.
+```
+
+Las tarjetas se capturan cada 250 ms con un lado máximo de 1536 píxeles.
+Este componente está pensado para información e imágenes; video y animación
+continua necesitan una política de captura específica, como la del cine VR.
 
 `VrPanel3D` permite agarrar y mover un panel. `VrWorldActionPanel3D` conserva
 su pose al mover la cabeza: sólo `reanchor` cambia su posición. Es apropiado
