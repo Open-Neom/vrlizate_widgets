@@ -1,7 +1,17 @@
-## Unreleased
+## 1.0.0 - 2026-10-17
 
-- Add `VrWidgetSurface3D` for bounded aspect-preserving 3D projection of Flutter widgets with throttled texture capture (250 ms, max 1536 px).
-- Support optional `content: VrWidgetSurface3D` header surface in `VrWorldActionPanel3D.create`.
+- Added `VrPlacementMode` (`staticWorld`, `dynamicBillboard`, `headLockedHud`, `dynamicFloating`) and `VrSpatialPose` so every 3D widget and layout can be placed statically or dynamically in the 3D scene.
+- Enhanced `VrSpatial` and `VrControlRegistry.updateSpatial` with `configurePlacement` and `updateSpatialPlacement`.
+- Added 3D counterparts for common Flutter Material widgets:
+  - `VrCard3D`: beveled 3D card with configurable elevation, header accent strip, and press callback.
+  - `VrSwitch3D`: pill track toggle switch with animated sliding thumb node.
+  - `VrChip3D`: selectable 3D filter/choice chip pill with indicator node.
+  - `VrIconButton3D`: circular or cubic 3D floating action button with raised center emblem.
+  - `VrDialog3D`: spatial 3D modal dialog with backdrop, header, confirm, and cancel actions.
+  - `VrListTile3D`: 3D list item row with leading indicator, main plate, and trailing action node.
+- Added 3D spatial layout containers: `VrRow3D`, `VrColumn3D`, and `VrGrid3D` for automatic X/Y alignment and group spatial transforms.
+- Added `VrWidgetSurface3D` for bounded aspect-preserving 3D projection of Flutter widgets with throttled texture capture (250 ms, max 1536 px) and optional `content` slot in `VrWorldActionPanel3D.create`.
+- Refactored codebase to follow Open Neom modular architecture (`lib/utils/constants/`, `lib/utils/enums/`, `lib/domain/models/`, `lib/ui/widgets/`, `lib/ui/layouts/`) with one public class/enum per file and centralized constants in `VrWidgetConstants`.
 
 ## 0.3.1 - 2026-09-22
 

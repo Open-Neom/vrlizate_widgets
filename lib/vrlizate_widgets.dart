@@ -1,39 +1,39 @@
-/// vrlizate_widgets — reusable gaze-interactive 3D widgets for Flutter GPU.
+/// vrlizate_widgets — reusable gaze-interactive 3D widgets and spatial layouts
+/// for Flutter GPU.
 ///
-/// The VR counterpart of basic Flutter widgets: buttons, toggles, dropdowns
-/// and movable panels implemented as native flutter_scene scene-graph nodes
-/// (stereo + gaze via vrlizate_scene's StereoSceneView raycast), with
-/// Flutter-style semantics:
-///
-/// - **Stateless / stateful**: [VrStatelessWidget] builds from config;
-///   [VrStatefulWidget] holds a [VrWidgetState] whose `setState` mutates
-///   materials/visibility and notifies the host HUD.
-/// - **Live resize**: [VrSpatial.scaleTo] makes any widget big or small
-///   without rebuilding nodes.
-/// - **Movable**: [VrPanel3D] grabs with a gaze-dwell on its handle bar and
-///   follows the gaze until dropped.
-/// - **Drag-and-drop**: [VrDragController] drags any node with the gaze
-///   (grab → follows the gaze ray → drop), host decides snap/delete rules.
-/// - **Sliders**: [VrSlider3D] is a segmented slider (gaze reports node
-///   names, not hit points): dwell a pad and the thumb glides there.
-/// - **Advanced controls**: [VrSegmentedControl3D], [VrProgressBar3D] and
-///   [VrStepper3D] cover tabs/filters, progress and bounded numeric input.
-/// - **3D text**: [VrTextLabel] renders text to a texture
-///   (canvas-to-texture sprite) — unlit, alpha-blended, optional billboard.
-/// - **World-locked actions**: [VrWorldActionPanel3D] presents information and
-///   buttons at a stable spatial pose, with gaze, laser and joystick routing.
-///
-/// Requires Flutter 3.47 or newer and a compatible Flutter GPU runtime.
-/// Follow the README and the installed flutter_scene setup instructions.
+/// The VR counterpart of core Flutter widgets and layout containers: buttons,
+/// toggles, switches, chips, cards, icon buttons, list tiles, dialogs,
+/// dropdowns, sliders, movable panels, and spatial layout containers (`VrRow3D`,
+/// `VrColumn3D`, `VrGrid3D`) implemented as native `flutter_scene` scene-graph
+/// nodes, with static and dynamic 3D placement modes (`VrPlacementMode`).
 library;
 
-export 'src/vr_widget_surface.dart';
+export 'domain/models/vr_spatial_pose.dart';
+export 'domain/models/vr_text_bitmap.dart';
+export 'domain/models/vr_world_action.dart';
+export 'domain/models/vr_world_pose.dart';
+export 'domain/models/vr_world_text_spec.dart';
 
-export 'src/vr_controls.dart';
 export 'src/vr_advanced_controls.dart';
-export 'src/vr_widget.dart';
-export 'src/vr_panel.dart';
+export 'src/vr_controls.dart';
 export 'src/vr_drag.dart';
+export 'src/vr_panel.dart';
 export 'src/vr_slider.dart';
 export 'src/vr_text.dart';
+export 'src/vr_widget.dart';
+export 'src/vr_widget_surface.dart';
 export 'src/vr_world_action_panel.dart';
+
+export 'ui/layouts/vr_column_3d.dart';
+export 'ui/layouts/vr_grid_3d.dart';
+export 'ui/layouts/vr_row_3d.dart';
+
+export 'ui/widgets/vr_card_3d.dart';
+export 'ui/widgets/vr_chip_3d.dart';
+export 'ui/widgets/vr_dialog_3d.dart';
+export 'ui/widgets/vr_icon_button_3d.dart';
+export 'ui/widgets/vr_list_tile_3d.dart';
+export 'ui/widgets/vr_switch_3d.dart';
+
+export 'utils/constants/vr_widget_constants.dart';
+export 'utils/enums/vr_placement_mode.dart';
