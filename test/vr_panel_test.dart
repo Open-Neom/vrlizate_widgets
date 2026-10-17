@@ -97,5 +97,40 @@ void main() {
           .distanceTo(panel.origin);
       expect(afterChild, closeTo(beforeChild * 2, 1e-6));
     });
+
+    test('Button B drag mode requires holding B while gazing and ignores accidental click', () {
+      final panel = makePanel()..enableButtonBDragMode();
+      final registry = VrControlRegistry();
+      panel.registerAll(registry);
+
+      registry.handleHover(Node(name: 'mv_settings'));
+      expect(panel.label, contains(VrWidgetConstants.panelGrabWithButtonBHint));
+
+      // Normal click / fast dwell without Button B does NOT grab the panel.
+      registry.handleSelect(Node(name: 'mv_settings'));
+      expect(panel.grabbed, isFalse);
+
+      // Holding B for less than 0.85s does not grab yet.
+      expect(
+        panel.updateButtonBDrag(buttonBHeld: true, dt: 0.4),
+        isFalse,
+      );
+      expect(panel.grabbed, isFalse);
+      expect(panel.dragHoldProgress, greaterThan(0.0));
+
+      // Holding B across the 0.85s threshold grabs the panel.
+      expect(
+        panel.updateButtonBDrag(buttonBHeld: true, dt: 0.5),
+        isTrue,
+      );
+      expect(panel.grabbed, isTrue);
+
+      // Releasing B drops the panel.
+      expect(
+        panel.updateButtonBDrag(buttonBHeld: false, dt: 0.016),
+        isFalse,
+      );
+      expect(panel.grabbed, isFalse);
+    });
   });
 }

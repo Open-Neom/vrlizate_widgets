@@ -16,6 +16,14 @@ class VrControlRegistry {
   /// Name of the node under the gaze right now (null = none).
   String? hoveredName;
 
+  /// Whether Button B is currently held for gaze-assisted dragging.
+  bool isButtonBHeld = false;
+
+  /// Updates the current Button B hold state.
+  void setButtonBHeld(bool held) {
+    isButtonBHeld = held;
+  }
+
   /// HUD label of the hovered control (null = none).
   String? get hoveredLabel =>
       hoveredName != null ? _controls[hoveredName]?.label : null;
@@ -52,6 +60,7 @@ class VrControlRegistry {
 
   void clear() {
     handleHover(null);
+    isButtonBHeld = false;
     _controls.clear();
     _activeControls.clear();
   }
@@ -80,6 +89,14 @@ class VrControlRegistry {
     final control = _controls[node.name];
     if (control == null || !control.enabled) return false;
     control.onSelect(node.name);
+    return true;
+  }
+
+  /// Forward of Button B / secondary action on a gazed node.
+  bool handleSecondarySelect(Node node) {
+    final control = _controls[node.name];
+    if (control == null || !control.enabled) return false;
+    control.onSecondarySelect(node.name);
     return true;
   }
 

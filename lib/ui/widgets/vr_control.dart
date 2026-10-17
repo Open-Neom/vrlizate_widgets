@@ -55,6 +55,9 @@ abstract class VrControl extends VrWidget {
   void onHoverExit(String nodeName);
   void onSelect(String nodeName);
 
+  /// Secondary action hook (e.g. Button B + Gaze for panel/node dragging).
+  void onSecondarySelect(String nodeName) {}
+
   /// Per-frame decay of the press flash.
   void update(double dt) {
     if (_flash <= 0) return;

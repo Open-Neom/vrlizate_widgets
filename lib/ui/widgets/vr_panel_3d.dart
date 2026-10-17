@@ -18,6 +18,8 @@ class VrPanel3D extends VrControl {
     double width = VrWidgetConstants.panelDefaultWidth,
     double spacing = VrWidgetConstants.panelDefaultSpacing,
     VrPlacementMode placementMode = VrPlacementMode.staticWorld,
+    this.requireButtonBForDrag = false,
+    this.dragHoldSeconds = VrWidgetConstants.defaultDragHoldSeconds,
   }) {
     final double height = 0.18 + spacing * children.length + 0.06;
 
@@ -64,6 +66,32 @@ class VrPanel3D extends VrControl {
   /// Test/headless hook — see [VrControlMeshBuilder].
   final VrControlMeshBuilder? meshBuilder;
 
+  /// When true, dragging the panel requires holding Button B while gazing at
+  /// the handle (preventing accidental grabs from normal gaze dwell or A clicks).
+  bool requireButtonBForDrag;
+
+  /// Deliberate hold time in seconds while gazing at the handle with Button B
+  /// pressed before the panel becomes grabbed.
+  double dragHoldSeconds;
+
+  /// Whether Button B is currently held.
+  bool buttonBHeld = false;
+
+  double _dragHoldElapsed = 0.0;
+
+  /// Normalized progress (0..1) toward grabbing the panel via Button B + gaze.
+  double get dragHoldProgress => dragHoldSeconds <= 0
+      ? 1.0
+      : (_dragHoldElapsed / dragHoldSeconds).clamp(0.0, 1.0);
+
+  /// Enables deliberate Button B + gaze hold mode for moving this panel.
+  void enableButtonBDragMode({
+    double holdSeconds = VrWidgetConstants.defaultDragHoldSeconds,
+  }) {
+    requireButtonBForDrag = true;
+    dragHoldSeconds = holdSeconds;
+  }
+
   /// Whether the panel is currently grabbed (following the gaze).
   bool grabbed = false;
   double _grabDistance = VrWidgetConstants.defaultGrabDistance;
@@ -92,9 +120,15 @@ class VrPanel3D extends VrControl {
   ];
 
   @override
-  String get label => grabbed
-      ? '$baseLabel ${VrWidgetConstants.panelGrabbedSuffix}'
-      : baseLabel;
+  String get label {
+    if (grabbed) {
+      return '$baseLabel ${VrWidgetConstants.panelGrabbedSuffix}';
+    }
+    if (requireButtonBForDrag && _hovered) {
+      return '$baseLabel ${VrWidgetConstants.panelGrabWithButtonBHint}';
+    }
+    return baseLabel;
+  }
 
   /// Registers the panel handle AND every child control.
   void registerAll(VrControlRegistry registry) {
@@ -137,16 +171,67 @@ class VrPanel3D extends VrControl {
   @override
   void onHoverExit(String nodeName) {
     _hovered = false;
+    _dragHoldElapsed = 0.0;
     applyEmissive();
+  }
+
+  void _toggleGrab() {
+    grabbed = !grabbed;
+    if (grabbed) {
+      _grabDistancePending = true;
+    } else {
+      _dragHoldElapsed = 0.0;
+    }
+    flash();
   }
 
   @override
   void onSelect(String nodeName) {
-    grabbed = !grabbed;
-    if (grabbed) {
-      _grabDistancePending = true;
+    if (requireButtonBForDrag && !buttonBHeld) {
+      return;
     }
-    flash();
+    _toggleGrab();
+  }
+
+  @override
+  void onSecondarySelect(String nodeName) {
+    buttonBHeld = true;
+    _toggleGrab();
+  }
+
+  /// Updates deliberate Button B + gaze hold state for grabbing/releasing the
+  /// panel handle.
+  bool updateButtonBDrag({
+    bool? isHovered,
+    required bool buttonBHeld,
+    required double dt,
+  }) {
+    this.buttonBHeld = buttonBHeld;
+    final hovered = isHovered ?? _hovered;
+
+    if (grabbed) {
+      if (requireButtonBForDrag && !buttonBHeld) {
+        grabbed = false;
+        _dragHoldElapsed = 0.0;
+        applyEmissive();
+        return false;
+      }
+      return true;
+    }
+
+    if (!hovered || !buttonBHeld || !dt.isFinite || dt <= 0) {
+      _dragHoldElapsed = 0.0;
+      return false;
+    }
+
+    _dragHoldElapsed += dt;
+    if (_dragHoldElapsed >= dragHoldSeconds) {
+      grabbed = true;
+      _grabDistancePending = true;
+      flash();
+      return true;
+    }
+    return false;
   }
 
   bool _grabDistancePending = false;

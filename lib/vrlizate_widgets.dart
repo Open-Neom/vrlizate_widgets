@@ -10,9 +10,11 @@ library;
 
 export 'domain/models/vr_spatial_pose.dart';
 export 'domain/models/vr_text_bitmap.dart';
+export 'domain/models/vr_wordsphere_plane.dart';
 export 'domain/models/vr_world_action.dart';
 export 'domain/models/vr_world_pose.dart';
 export 'domain/models/vr_world_text_spec.dart';
+export 'domain/services/vr_wordsphere_session_controller.dart';
 
 export 'src/vr_advanced_controls.dart';
 export 'src/vr_controls.dart';
@@ -36,4 +38,5 @@ export 'ui/widgets/vr_list_tile_3d.dart';
 export 'ui/widgets/vr_switch_3d.dart';
 
 export 'utils/constants/vr_widget_constants.dart';
+export 'utils/constants/vr_wordsphere_constants.dart';
 export 'utils/enums/vr_placement_mode.dart';

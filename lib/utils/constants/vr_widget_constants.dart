@@ -34,6 +34,8 @@ class VrWidgetConstants {
   // ─── Default labels & HUD strings ───────────────────────────────
   static const String dropdownOpenSuffix = '(abierto)';
   static const String panelGrabbedSuffix = '(muévelo con la mirada)';
+  static const String panelGrabWithButtonBHint =
+      '(mantén B + mirada para mover)';
   static const String stepperMinusSymbol = '−';
   static const String stepperPlusSymbol = '+';
   static const String stepperEqualsSymbol = '=';
@@ -57,6 +59,11 @@ class VrWidgetConstants {
   static const double maxDragDistance = 8.0;
   static const double defaultDragDistance = 2.0;
   static const double directionEpsilon = 1e-10;
+
+  // ─── Gaze dwell & Button B drag timing defaults ─────────────────
+  static const double defaultGazeClickDwellSeconds = 2.6;
+  static const double defaultDragHoldSeconds = 0.85;
+  static const double defaultGazeOnlyDragHoldSeconds = 2.8;
 
   // ─── Flash & material defaults ──────────────────────────────────
   static const double flashDecayPerSecond = 4.0;

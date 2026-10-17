@@ -66,5 +66,62 @@ void main() {
       expect(drag.isDragging, isFalse);
       expect(drag.end(eye, forward), isNull);
     });
+
+    test('requireButtonB blocks drag unless Button B is held for holdDurationSeconds', () {
+      final drag = VrDragController();
+      final candidatePos = vm.Vector3(0, 1.6, -2.2);
+
+      // Without Button B: does not start even after gazing for 2 seconds.
+      expect(
+        drag.updateDragCandidate(
+          hoveredName: 'card_1',
+          candidatePosition: candidatePos,
+          buttonBHeld: false,
+          dt: 2.0,
+        ),
+        isFalse,
+      );
+      expect(drag.isDragging, isFalse);
+      expect(drag.holdProgress, 0.0);
+
+      // With Button B held briefly (< 0.85s): builds progress but does not start yet.
+      expect(
+        drag.updateDragCandidate(
+          hoveredName: 'card_1',
+          candidatePosition: candidatePos,
+          buttonBHeld: true,
+          dt: 0.4,
+        ),
+        isFalse,
+      );
+      expect(drag.isDragging, isFalse);
+      expect(drag.holdProgress, greaterThan(0.0));
+      expect(drag.holdProgress, lessThan(1.0));
+
+      // Continuing to hold Button B past 0.85s starts the drag.
+      expect(
+        drag.updateDragCandidate(
+          hoveredName: 'card_1',
+          candidatePosition: candidatePos,
+          buttonBHeld: true,
+          dt: 0.5,
+        ),
+        isTrue,
+      );
+      expect(drag.isDragging, isTrue);
+      expect(drag.grabbedName, 'card_1');
+
+      // Releasing Button B automatically releases the drag.
+      expect(
+        drag.updateDragCandidate(
+          hoveredName: 'card_1',
+          candidatePosition: candidatePos,
+          buttonBHeld: false,
+          dt: 0.016,
+        ),
+        isFalse,
+      );
+      expect(drag.isDragging, isFalse);
+    });
   });
 }
