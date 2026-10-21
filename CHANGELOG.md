@@ -1,6 +1,8 @@
-## 1.0.0 - 2026-10-17
+## 1.0.0 - 2026-10-20
 
 - Added `VrPlacementMode` (`staticWorld`, `dynamicBillboard`, `headLockedHud`, `dynamicFloating`) and `VrSpatialPose` so every 3D widget and layout can be placed statically or dynamically in the 3D scene.
+- Added deliberate Button B + Gaze Drag (`VrDragController.updateDragCandidate`, `VrPanel3D.enableButtonBDragMode`, `0.85 s` hold with Button B or `2.8 s` gaze-only hold) so panels are never dragged accidentally while looking around.
+- Added `VrWordspherePlane`, `VrWordsphereSessionController`, and `VrWordsphereConstants` for 3D world-plane projection and Head + Joystick hybrid Wordsphere text input across the VRlizate SDK.
 - Enhanced `VrSpatial` and `VrControlRegistry.updateSpatial` with `configurePlacement` and `updateSpatialPlacement`.
 - Added 3D counterparts for common Flutter Material widgets:
   - `VrCard3D`: beveled 3D card with configurable elevation, header accent strip, and press callback.
