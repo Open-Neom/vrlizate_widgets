@@ -5,6 +5,8 @@ version: 1.0.0
 homepage: https://github.com/Open-Neom/vrlizate_widgets
 repository: https://github.com/Open-Neom/vrlizate_widgets
 issue_tracker: https://github.com/Open-Neom/vrlizate_widgets/issues
+funding:
+  - https://github.com/sponsors/Open-Neom
 
 platforms:
   android:
