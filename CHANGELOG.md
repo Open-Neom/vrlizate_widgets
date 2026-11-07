@@ -1,7 +1,8 @@
-## Unreleased
+## 0.3.2 - 2026-11-07
 
 - Add `VrWidgetSurface3D` for bounded aspect-preserving 3D projection of Flutter widgets with throttled texture capture (250 ms, max 1536 px).
 - Support optional `content: VrWidgetSurface3D` header surface in `VrWorldActionPanel3D.create`.
+- Add `@Open-Neom` GitHub Sponsors `funding` metadata.
 
 ## 0.3.1 - 2026-09-22
 
