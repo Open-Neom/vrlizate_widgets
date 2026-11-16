@@ -13,6 +13,7 @@ final class VrBeveledBoxArrays {
     required this.positions,
     required this.normals,
     required this.texCoords,
+    required this.colors,
     required this.tangents,
     required this.indices,
   });
@@ -20,6 +21,7 @@ final class VrBeveledBoxArrays {
   final Float32List positions;
   final Float32List normals;
   final Float32List texCoords;
+  final Float32List colors;
   final Float32List tangents;
   final List<int> indices;
 
@@ -98,6 +100,7 @@ abstract final class VrBeveledBoxGeometry {
       positions: arrays.positions,
       normals: arrays.normals,
       texCoords: arrays.texCoords,
+      colors: arrays.colors,
       tangents: arrays.tangents,
       indices: arrays.indices,
     );
@@ -395,10 +398,29 @@ abstract final class VrBeveledBoxGeometry {
       indices: indices,
     );
 
+    // Subtle directional bevel shading & cavity self-occlusion so untextured
+    // spatial controls (buttons, pills, dialogs, sliders) read with crisp
+    // machined 3D depth even under flat ambient lighting.
+    final colors = Float32List(totalVerts * 4);
+    for (var v = 0; v < totalVerts; v++) {
+      final p = v * 3;
+      final c = v * 4;
+      final ny = normals[p + 1];
+      final nz = normals[p + 2];
+      // Front face (+Z) stays neutral ~1.0; top bevel (+Y/+Z) catches a gentle
+      // rim lift; underside (-Y) and rear (-Z) darken slightly for depth.
+      final shade = (0.93 + 0.05 * nz + 0.08 * ny).clamp(0.78, 1.0);
+      colors[c] = shade;
+      colors[c + 1] = shade;
+      colors[c + 2] = shade;
+      colors[c + 3] = 1.0;
+    }
+
     return VrBeveledBoxArrays(
       positions: positions,
       normals: normals,
       texCoords: uvs,
+      colors: colors,
       tangents: tangents,
       indices: indices,
     );

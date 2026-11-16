@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/painting.dart';
@@ -52,7 +53,20 @@ class VrTextRaster {
       if (bytes == null) {
         throw StateError('VrTextRaster: could not read RGBA pixels');
       }
-      return VrTextBitmap(bytes.buffer.asUint8List(), w, h);
+      final raw = Uint8List.fromList(bytes.buffer.asUint8List());
+      // Bleed ink RGB into zero-alpha texels so GPU bilinear + mipmap filtering
+      // with AlphaMode.blend never interpolates toward black (0, 0, 0) halos.
+      final rBleed = (color.r * 255).round().clamp(0, 255);
+      final gBleed = (color.g * 255).round().clamp(0, 255);
+      final bBleed = (color.b * 255).round().clamp(0, 255);
+      for (var i = 0; i < raw.length; i += 4) {
+        if (raw[i + 3] == 0) {
+          raw[i] = rBleed;
+          raw[i + 1] = gBleed;
+          raw[i + 2] = bBleed;
+        }
+      }
+      return VrTextBitmap(raw, w, h);
     } finally {
       image.dispose();
       picture.dispose();

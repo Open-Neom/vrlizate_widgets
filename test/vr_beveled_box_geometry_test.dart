@@ -24,6 +24,22 @@ void main() {
           );
           expect(a.vertexCount, greaterThan(24), reason: label);
           expect(a.triangleCount, greaterThan(32), reason: label);
+          expect(a.colors.length, a.vertexCount * 4, reason: label);
+
+          var maxTopShade = 0.0;
+          var minBottomShade = 1.0;
+          for (var v = 0; v < a.vertexCount; v++) {
+            final ny = a.normals[v * 3 + 1];
+            final shade = a.colors[v * 4];
+            expect(a.colors[v * 4 + 3], 1.0);
+            if (ny > 0.7) maxTopShade = math.max(maxTopShade, shade);
+            if (ny < -0.7) minBottomShade = math.min(minBottomShade, shade);
+          }
+          expect(
+            maxTopShade,
+            greaterThan(minBottomShade),
+            reason: '$label top bevel highlight vs bottom self-occlusion',
+          );
 
           var minX = double.infinity, maxX = -double.infinity;
           var minY = double.infinity, maxY = -double.infinity;

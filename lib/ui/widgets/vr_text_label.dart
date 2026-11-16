@@ -64,6 +64,7 @@ class VrTextLabel {
       bitmap.pixels,
       bitmap.width,
       bitmap.height,
+      sampling: const TextureSampling(mipmaps: true, maxAnisotropy: 8),
     );
     final material = UnlitMaterial(colorTexture: texture)
       ..alphaMode = AlphaMode.blend

@@ -38,18 +38,29 @@ void main() {
         'RGB',
         color: const Color(0xFFFF0000),
       );
-      // Find an opaque pixel and check it is reddish (straight alpha RGBA).
-      var found = false;
+      // Find an opaque pixel and check it is reddish (straight alpha RGBA),
+      // and verify transparent pixels bleed text RGB instead of black (0,0,0).
+      var foundOpaque = false;
+      var foundTransparentBleed = false;
       for (var i = 0; i < bmp.pixels.length; i += 4) {
         final a = bmp.pixels[i + 3];
         if (a > 200) {
           expect(bmp.pixels[i], greaterThan(150)); // R
           expect(bmp.pixels[i + 1], lessThan(80)); // G
-          found = true;
-          break;
+          foundOpaque = true;
+        } else if (a == 0) {
+          expect(bmp.pixels[i], 255); // bled R
+          expect(bmp.pixels[i + 1], 0); // bled G
+          expect(bmp.pixels[i + 2], 0); // bled B
+          foundTransparentBleed = true;
         }
       }
-      expect(found, isTrue, reason: 'no fully opaque pixel found');
+      expect(foundOpaque, isTrue, reason: 'no fully opaque pixel found');
+      expect(
+        foundTransparentBleed,
+        isTrue,
+        reason: 'transparent texels must bleed ink RGB to avoid black halos',
+      );
     });
   });
 }

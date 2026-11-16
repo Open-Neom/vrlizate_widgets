@@ -13,5 +13,10 @@ class VrTextBitmap {
   double get aspect => width / max(height, 1);
 
   /// Whether any pixel is visible (alpha > 0).
-  bool get hasInk => pixels.any((p) => p != 0);
+  bool get hasInk {
+    for (var i = 3; i < pixels.length; i += 4) {
+      if (pixels[i] != 0) return true;
+    }
+    return false;
+  }
 }

@@ -16,7 +16,7 @@ PhysicallyBasedMaterial controlMaterial(vm.Vector4 color) {
     ..metallicFactor = VrWidgetConstants.defaultMetallicFactor
     ..roughnessFactor = VrWidgetConstants.defaultRoughnessFactor
     ..emissiveFactor = vm.Vector4.zero()
-    ..vertexColorWeight = 0.0;
+    ..vertexColorWeight = 1.0;
 }
 
 /// A gaze-interactive 3D control that is also a [VrWidget] with `VrSpatial`.
