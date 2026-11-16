@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -37,8 +38,9 @@ class VrListTile3D extends VrControl {
       mesh:
           meshBuilder?.call() ??
           Mesh(
-            CuboidGeometry(
+            VrBeveledBoxGeometry.panel(
               vm.Vector3(width, height, VrWidgetConstants.listTilePlateDepth),
+              cornerRadius: 0.028,
             ),
             _plateMat,
           ),
@@ -73,12 +75,13 @@ class VrListTile3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(
+                  VrBeveledBoxGeometry.create(
                     vm.Vector3(
                       VrWidgetConstants.listTileTrailingSize,
                       VrWidgetConstants.listTileTrailingSize,
                       VrWidgetConstants.listTilePlateDepth,
                     ),
+                    cornerRadius: VrWidgetConstants.listTileTrailingSize * 0.28,
                   ),
                   _trailingMat,
                 ),

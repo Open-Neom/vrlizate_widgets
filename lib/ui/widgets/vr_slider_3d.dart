@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -25,7 +26,10 @@ class VrSlider3D extends VrControl {
       name: name,
       mesh:
           meshBuilder?.call() ??
-          Mesh(CuboidGeometry(vm.Vector3(width, 0.035, 0.035)), _trackMat),
+          Mesh(
+            VrBeveledBoxGeometry.pill(vm.Vector3(width, 0.035, 0.035)),
+            _trackMat,
+          ),
     )..localTransform = vm.Matrix4.translation(center);
 
     for (var i = 0; i < divisions; i++) {
@@ -37,9 +41,11 @@ class VrSlider3D extends VrControl {
         Node(
           name: '$_segmentPrefix$i',
           mesh:
-               meshBuilder?.call() ??
+              meshBuilder?.call() ??
               Mesh(
-                CuboidGeometry(vm.Vector3(width / (divisions + 2), 0.05, 0.02)),
+                VrBeveledBoxGeometry.pill(
+                  vm.Vector3(width / (divisions + 2), 0.05, 0.02),
+                ),
                 mat,
               ),
         )..localTransform = vm.Matrix4.translation(center + _segmentOffsets[i]),

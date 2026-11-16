@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -35,7 +36,9 @@ class VrProgressBar3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(vm.Vector3(width + 0.05, 0.13, 0.035)),
+                  VrBeveledBoxGeometry.pill(
+                    vm.Vector3(width + 0.05, 0.13, 0.035),
+                  ),
                   _backMaterial,
                 ),
           )
@@ -53,7 +56,9 @@ class VrProgressBar3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(vm.Vector3(segmentWidth - 0.01, 0.085, 0.045)),
+                  VrBeveledBoxGeometry.create(
+                    vm.Vector3(segmentWidth - 0.01, 0.085, 0.045),
+                  ),
                   material,
                 ),
           )

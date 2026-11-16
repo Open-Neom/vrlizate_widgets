@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -46,7 +47,7 @@ class VrStepper3D extends VrControl {
       mesh:
           meshBuilder?.call() ??
           Mesh(
-            CuboidGeometry(vm.Vector3(centerWidth, 0.15, 0.055)),
+            VrBeveledBoxGeometry.create(vm.Vector3(centerWidth, 0.15, 0.055)),
             _centerMaterial,
           ),
     )..localTransform = vm.Matrix4.translation(center);
@@ -59,7 +60,9 @@ class VrStepper3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(vm.Vector3(padWidth, 0.15, 0.065)),
+                  VrBeveledBoxGeometry.create(
+                    vm.Vector3(padWidth, 0.15, 0.065),
+                  ),
                   _decrementMaterial,
                 ),
           )
@@ -72,7 +75,9 @@ class VrStepper3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(vm.Vector3(padWidth, 0.15, 0.065)),
+                  VrBeveledBoxGeometry.create(
+                    vm.Vector3(padWidth, 0.15, 0.065),
+                  ),
                   _incrementMaterial,
                 ),
           )
@@ -145,7 +150,7 @@ class VrStepper3D extends VrControl {
       mesh:
           meshBuilder?.call() ??
           Mesh(
-            CuboidGeometry(
+            VrBeveledBoxGeometry.pill(
               horizontal
                   ? vm.Vector3(0.055, 0.012, 0.012)
                   : vm.Vector3(0.012, 0.055, 0.012),

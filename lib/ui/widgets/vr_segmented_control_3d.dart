@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -41,7 +42,7 @@ class VrSegmentedControl3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(
+                  VrBeveledBoxGeometry.pill(
                     vm.Vector3(width + 0.045, height + 0.04, 0.035),
                   ),
                   _railMaterial,
@@ -61,7 +62,7 @@ class VrSegmentedControl3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(
+                  VrBeveledBoxGeometry.create(
                     vm.Vector3(segmentWidth - 0.012, height, 0.055),
                   ),
                   material,

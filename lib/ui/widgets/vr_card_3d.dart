@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -36,12 +37,13 @@ class VrCard3D extends VrControl {
       mesh:
           meshBuilder?.call() ??
           Mesh(
-            CuboidGeometry(
+            VrBeveledBoxGeometry.panel(
               vm.Vector3(
                 width + VrWidgetConstants.cardBevelPadding,
                 height + VrWidgetConstants.cardBevelPadding,
                 VrWidgetConstants.cardBevelDepth,
               ),
+              cornerRadius: 0.042,
             ),
             _bevelMat,
           ),
@@ -53,12 +55,13 @@ class VrCard3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(
+                  VrBeveledBoxGeometry.panel(
                     vm.Vector3(
                       width,
                       height,
                       VrWidgetConstants.cardDefaultDepth,
                     ),
+                    cornerRadius: 0.036,
                   ),
                   _plateMat,
                 ),
@@ -79,7 +82,7 @@ class VrCard3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(
+                  VrBeveledBoxGeometry.pill(
                     vm.Vector3(
                       width - 0.04,
                       VrWidgetConstants.cardAccentHeight,

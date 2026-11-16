@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -27,7 +28,9 @@ class VrDropdown3D extends VrControl {
       mesh:
           meshBuilder?.call() ??
           Mesh(
-            CuboidGeometry(vm.Vector3(width, optionHeight + 0.02, 0.06)),
+            VrBeveledBoxGeometry.create(
+              vm.Vector3(width, optionHeight + 0.02, 0.06),
+            ),
             _headerMat,
           ),
     )..localTransform = vm.Matrix4.translation(center);
@@ -44,7 +47,9 @@ class VrDropdown3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(vm.Vector3(width * 0.92, optionHeight, 0.05)),
+                  VrBeveledBoxGeometry.create(
+                    vm.Vector3(width * 0.92, optionHeight, 0.05),
+                  ),
                   mat,
                 ),
           )

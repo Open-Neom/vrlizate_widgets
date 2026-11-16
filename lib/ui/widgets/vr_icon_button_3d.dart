@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -31,9 +32,12 @@ class VrIconButton3D extends VrControl {
           meshBuilder?.call() ??
           Mesh(
             isCircular
-                ? SphereGeometry(radius: size * 0.5)
-                : CuboidGeometry(
+                ? VrBeveledBoxGeometry.pill(
                     vm.Vector3(size, size, VrWidgetConstants.iconButtonDepth),
+                  )
+                : VrBeveledBoxGeometry.create(
+                    vm.Vector3(size, size, VrWidgetConstants.iconButtonDepth),
+                    cornerRadius: size * 0.24,
                   ),
             _baseMat,
           ),
@@ -46,8 +50,9 @@ class VrIconButton3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(
+                  VrBeveledBoxGeometry.create(
                     vm.Vector3(emblemSize, emblemSize, emblemSize * 0.45),
+                    cornerRadius: emblemSize * 0.28,
                   ),
                   _emblemMat,
                 ),

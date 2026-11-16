@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -28,7 +29,10 @@ class VrPanel3D extends VrControl {
       name: handleName,
       mesh:
           meshBuilder?.call() ??
-          Mesh(CuboidGeometry(vm.Vector3(width, 0.1, 0.05)), _handleMat),
+          Mesh(
+            VrBeveledBoxGeometry.pill(vm.Vector3(width, 0.1, 0.05)),
+            _handleMat,
+          ),
     )..localTransform = vm.Matrix4.translation(center);
 
     _plateMat = controlMaterial(vm.Vector4(0.05, 0.06, 0.09, 1.0));
@@ -37,7 +41,10 @@ class VrPanel3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(vm.Vector3(width + 0.08, height, 0.02)),
+                  VrBeveledBoxGeometry.panel(
+                    vm.Vector3(width + 0.08, height, 0.024),
+                    cornerRadius: 0.04,
+                  ),
                   _plateMat,
                 ),
           )

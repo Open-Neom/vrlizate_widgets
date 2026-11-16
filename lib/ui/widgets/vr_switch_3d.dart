@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -34,7 +35,7 @@ class VrSwitch3D extends VrControl {
       mesh:
           meshBuilder?.call() ??
           Mesh(
-            CuboidGeometry(
+            VrBeveledBoxGeometry.pill(
               vm.Vector3(width, height, VrWidgetConstants.switchTrackDepth),
             ),
             _trackMat,

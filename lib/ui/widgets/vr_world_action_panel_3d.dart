@@ -8,6 +8,7 @@ import 'package:vector_math/vector_math.dart' as vm;
 import '../../domain/models/vr_world_action.dart';
 import '../../domain/models/vr_world_pose.dart';
 import '../../domain/models/vr_world_text_spec.dart';
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import 'vr_button_3d.dart';
 import 'vr_control.dart';
@@ -146,7 +147,10 @@ class VrWorldActionPanel3D {
       mesh:
           meshBuilder?.call() ??
           Mesh(
-            CuboidGeometry(vm.Vector3(width, panelHeight, 0.055)),
+            VrBeveledBoxGeometry.panel(
+              vm.Vector3(width, panelHeight, 0.055),
+              cornerRadius: 0.048,
+            ),
             plateMaterial,
           ),
     )..raycastable = false;

@@ -17,6 +17,7 @@ export 'domain/models/vr_world_text_spec.dart';
 export 'domain/services/vr_wordsphere_session_controller.dart';
 
 export 'src/vr_advanced_controls.dart';
+export 'src/vr_beveled_box_geometry.dart';
 export 'src/vr_controls.dart';
 export 'src/vr_drag.dart';
 export 'src/vr_panel.dart';

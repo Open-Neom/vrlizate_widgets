@@ -1,6 +1,7 @@
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
+import '../../src/vr_beveled_box_geometry.dart';
 import '../../utils/constants/vr_widget_constants.dart';
 import '../../utils/enums/vr_placement_mode.dart';
 import 'vr_control.dart';
@@ -44,8 +45,9 @@ class VrDialog3D extends VrControl {
       mesh:
           meshBuilder?.call() ??
           Mesh(
-            CuboidGeometry(
+            VrBeveledBoxGeometry.panel(
               vm.Vector3(width, height, VrWidgetConstants.dialogBackdropDepth),
+              cornerRadius: 0.044,
             ),
             _backdropMat,
           ),
@@ -58,12 +60,13 @@ class VrDialog3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(
+                  VrBeveledBoxGeometry.panel(
                     vm.Vector3(
                       width,
                       VrWidgetConstants.dialogHeaderHeight,
                       VrWidgetConstants.dialogBackdropDepth + 0.012,
                     ),
+                    cornerRadius: 0.036,
                   ),
                   _headerMat,
                 ),
@@ -80,7 +83,7 @@ class VrDialog3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(
+                  VrBeveledBoxGeometry.pill(
                     vm.Vector3(
                       VrWidgetConstants.dialogButtonWidth,
                       VrWidgetConstants.dialogButtonHeight,
@@ -105,7 +108,7 @@ class VrDialog3D extends VrControl {
             mesh:
                 meshBuilder?.call() ??
                 Mesh(
-                  CuboidGeometry(
+                  VrBeveledBoxGeometry.pill(
                     vm.Vector3(
                       VrWidgetConstants.dialogButtonWidth,
                       VrWidgetConstants.dialogButtonHeight,
