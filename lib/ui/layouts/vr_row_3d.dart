@@ -17,18 +17,24 @@ class VrRow3D extends VrStatelessWidget {
     String? label,
     required vm.Vector3 origin,
     required List<VrWidget> children,
-    this.spacing = VrWidgetConstants.rowDefaultSpacing,
+    double spacing = VrWidgetConstants.rowDefaultSpacing,
     VrPlacementMode placementMode = VrPlacementMode.staticWorld,
-  }) : assert(spacing >= 0, 'spacing must be non-negative'),
+  }) : spacing = !spacing.isFinite || spacing < 0
+           ? 0.0
+           : (spacing > 100.0 ? 100.0 : spacing),
        _label = label ?? name,
        children = List.unmodifiable(children) {
+    final safeOrigin =
+        origin.x.isFinite && origin.y.isFinite && origin.z.isFinite
+        ? origin
+        : vm.Vector3.zero();
     for (var i = 0; i < this.children.length; i++) {
       final child = this.children[i];
-      final xOffset = (i - (this.children.length - 1) / 2.0) * spacing;
-      final target = origin + vm.Vector3(xOffset, 0, 0);
+      final xOffset = (i - (this.children.length - 1) / 2.0) * this.spacing;
+      final target = safeOrigin + vm.Vector3(xOffset, 0, 0);
       _placeChild(child, target);
     }
-    initSpatial(origin, mode: placementMode);
+    initSpatial(safeOrigin, mode: placementMode);
   }
 
   final String _label;

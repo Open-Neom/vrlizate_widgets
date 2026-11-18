@@ -44,39 +44,64 @@ class VrWordspherePlane {
     vm.Vector4(center.x, center.y, center.z, 1),
   );
 
-  /// Converts a 2D board point `(0..baseSize, 0..baseSize)` into 3D world space.
+  /// Converts a 2D board point `(0..baseSize, 0..baseSize)` into 3D world space
+  /// with a single `Vector3` allocation (no intermediate operator temporaries).
   vm.Vector3 worldPoint(
     Offset point, {
     double baseSize = VrWordsphereConstants.defaultBaseSizeTexels,
-  }) =>
-      center +
-      right * ((point.dx / baseSize - 0.5) * size) +
-      up * ((0.5 - point.dy / baseSize) * size);
+  }) {
+    final u = (point.dx / baseSize - 0.5) * size;
+    final v = (0.5 - point.dy / baseSize) * size;
+    return vm.Vector3(
+      center.x + right.x * u + up.x * v,
+      center.y + right.y * u + up.y * v,
+      center.z + right.z * u + up.z * v,
+    );
+  }
 
   /// Converts a 2D board point into a 3D cursor position lifted slightly off
-  /// the board toward the viewer to prevent z-fighting.
+  /// the board toward the viewer to prevent z-fighting (`1` allocation).
   vm.Vector3 cursorWorldPoint(
     Offset point, {
     double baseSize = VrWordsphereConstants.defaultBaseSizeTexels,
     double lift = VrWordsphereConstants.defaultCursorLiftMeters,
-  }) => worldPoint(point, baseSize: baseSize) + normal * lift;
+  }) {
+    final u = (point.dx / baseSize - 0.5) * size;
+    final v = (0.5 - point.dy / baseSize) * size;
+    return vm.Vector3(
+      center.x + right.x * u + up.x * v + normal.x * lift,
+      center.y + right.y * u + up.y * v + normal.y * lift,
+      center.z + right.z * u + up.z * v + normal.z * lift,
+    );
+  }
 
   /// Intersects a 3D world [ray] (head gaze or laser pointer) with the circular
   /// Wordsphere board and returns its 2D board coordinate, or `null` if missed.
+  ///
+  /// Uses direct scalar dot products (`0` intermediate `Vector3` allocations per 120 Hz frame).
   Offset? intersect(
     vm.Ray ray, {
     double baseSize = VrWordsphereConstants.defaultBaseSizeTexels,
   }) {
-    final denominator = ray.direction.dot(normal);
+    final dir = ray.direction;
+    final orig = ray.origin;
+    final denominator =
+        dir.x * normal.x + dir.y * normal.y + dir.z * normal.z;
     if (!denominator.isFinite ||
         denominator >= VrWordsphereConstants.rayParallelEpsilon) {
       return null;
     }
-    final t = (center - ray.origin).dot(normal) / denominator;
+    final toCx = center.x - orig.x;
+    final toCy = center.y - orig.y;
+    final toCz = center.z - orig.z;
+    final t = (toCx * normal.x + toCy * normal.y + toCz * normal.z) / denominator;
     if (!t.isFinite || t <= 0) return null;
-    final offset = ray.origin + ray.direction * t - center;
-    final x = offset.dot(right) / size;
-    final y = -offset.dot(up) / size;
+
+    final ox = orig.x + dir.x * t - center.x;
+    final oy = orig.y + dir.y * t - center.y;
+    final oz = orig.z + dir.z * t - center.z;
+    final x = (ox * right.x + oy * right.y + oz * right.z) / size;
+    final y = -(ox * up.x + oy * up.y + oz * up.z) / size;
     const maxR = VrWordsphereConstants.maxHitRadiusNormalized;
     if (x * x + y * y > maxR * maxR) return null;
     return Offset((x + 0.5) * baseSize, (y + 0.5) * baseSize);

@@ -18,28 +18,38 @@ class VrGrid3D extends VrStatelessWidget {
     String? label,
     required vm.Vector3 origin,
     required List<VrWidget> children,
-    this.columns = VrWidgetConstants.gridDefaultColumns,
-    this.columnSpacing = VrWidgetConstants.gridDefaultColumnSpacing,
-    this.rowSpacing = VrWidgetConstants.gridDefaultRowSpacing,
+    int columns = VrWidgetConstants.gridDefaultColumns,
+    double columnSpacing = VrWidgetConstants.gridDefaultColumnSpacing,
+    double rowSpacing = VrWidgetConstants.gridDefaultRowSpacing,
     VrPlacementMode placementMode = VrPlacementMode.staticWorld,
-  }) : assert(columns >= 1, 'columns must be at least 1'),
-       assert(columnSpacing >= 0, 'columnSpacing must be non-negative'),
-       assert(rowSpacing >= 0, 'rowSpacing must be non-negative'),
+  }) : columns = !columns.isFinite || columns < 1
+           ? 1
+           : (columns > 256 ? 256 : columns),
+       columnSpacing = !columnSpacing.isFinite || columnSpacing < 0
+           ? 0.0
+           : (columnSpacing > 100.0 ? 100.0 : columnSpacing),
+       rowSpacing = !rowSpacing.isFinite || rowSpacing < 0
+           ? 0.0
+           : (rowSpacing > 100.0 ? 100.0 : rowSpacing),
        _label = label ?? name,
        children = List.unmodifiable(children) {
+    final safeOrigin =
+        origin.x.isFinite && origin.y.isFinite && origin.z.isFinite
+        ? origin
+        : vm.Vector3.zero();
     final rows = this.children.isEmpty
         ? 0
-        : (this.children.length + columns - 1) ~/ columns;
+        : (this.children.length + this.columns - 1) ~/ this.columns;
     for (var i = 0; i < this.children.length; i++) {
       final child = this.children[i];
-      final col = i % columns;
-      final row = i ~/ columns;
-      final xOffset = (col - (columns - 1) / 2.0) * columnSpacing;
-      final yOffset = ((rows - 1) / 2.0 - row) * rowSpacing;
-      final target = origin + vm.Vector3(xOffset, yOffset, 0);
+      final col = i % this.columns;
+      final row = i ~/ this.columns;
+      final xOffset = (col - (this.columns - 1) / 2.0) * this.columnSpacing;
+      final yOffset = ((rows - 1) / 2.0 - row) * this.rowSpacing;
+      final target = safeOrigin + vm.Vector3(xOffset, yOffset, 0);
       _placeChild(child, target);
     }
-    initSpatial(origin, mode: placementMode);
+    initSpatial(safeOrigin, mode: placementMode);
   }
 
   final String _label;

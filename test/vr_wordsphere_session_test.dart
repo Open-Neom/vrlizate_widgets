@@ -61,5 +61,15 @@ void main() {
       isFalse,
     );
     expect(deleted, 1);
+
+    // Non-finite stick inputs must never poison stickPoint with NaN.
+    final safePos = session.updateCursor(
+      ray: centerRay,
+      stickX: double.infinity,
+      stickY: double.nan,
+      dt: 0.05,
+    )!;
+    expect(safePos.dx.isFinite, isTrue);
+    expect(safePos.dy.isFinite, isTrue);
   });
 }

@@ -11,23 +11,35 @@ import 'vr_control.dart';
 /// Progress changes only material state, never geometry. This avoids runtime
 /// mesh uploads and survives a parent `VrPanel3D` moving or scaling its nodes.
 class VrProgressBar3D extends VrControl {
+  static double _clamp01(double v) => !v.isFinite ? 0.0 : v.clamp(0.0, 1.0);
+
   VrProgressBar3D({
     required super.name,
     required super.label,
     required vm.Vector3 center,
     double initialValue = 0,
-    this.segments = VrWidgetConstants.progressDefaultSegments,
+    int segments = VrWidgetConstants.progressDefaultSegments,
     this.valueFormat,
     this.onPressed,
     this.meshBuilder,
-    this.width = VrWidgetConstants.progressDefaultWidth,
+    double width = VrWidgetConstants.progressDefaultWidth,
     vm.Vector4? fillColor,
     vm.Vector4? emptyColor,
     VrPlacementMode placementMode = VrPlacementMode.staticWorld,
   }) : assert(segments >= 2, 'a progress bar needs at least 2 segments'),
-       value = initialValue.clamp(0.0, 1.0),
+       segments = !segments.isFinite || segments < 2
+           ? 2
+           : (segments > 1024 ? 1024 : segments),
+       width = !width.isFinite || width <= 0
+           ? VrWidgetConstants.progressDefaultWidth
+           : width,
+       value = _clamp01(initialValue),
        fillColor = fillColor ?? vm.Vector4(0.16, 0.88, 0.62, 1.0),
        emptyColor = emptyColor ?? vm.Vector4(0.08, 0.11, 0.17, 1.0) {
+    final safeCenter =
+        center.x.isFinite && center.y.isFinite && center.z.isFinite
+        ? center
+        : vm.Vector3.zero();
     _backMaterial = controlMaterial(vm.Vector4(0.025, 0.035, 0.055, 1.0))
       ..metallicFactor = 0.55;
     _back =
@@ -37,17 +49,17 @@ class VrProgressBar3D extends VrControl {
                 meshBuilder?.call() ??
                 Mesh(
                   VrBeveledBoxGeometry.pill(
-                    vm.Vector3(width + 0.05, 0.13, 0.035),
+                    vm.Vector3(this.width + 0.05, 0.13, 0.035),
                   ),
                   _backMaterial,
                 ),
           )
           ..localTransform = vm.Matrix4.translation(
-            center + vm.Vector3(0, 0, -0.025),
+            safeCenter + vm.Vector3(0, 0, -0.025),
           );
 
-    final segmentWidth = width / segments;
-    for (var i = 0; i < segments; i++) {
+    final segmentWidth = this.width / this.segments;
+    for (var i = 0; i < this.segments; i++) {
       final material = controlMaterial(this.emptyColor)..roughnessFactor = 0.25;
       _segmentMaterials.add(material);
       _segmentNodes.add(
@@ -63,12 +75,16 @@ class VrProgressBar3D extends VrControl {
                 ),
           )
           ..localTransform = vm.Matrix4.translation(
-            center +
-                vm.Vector3(-width / 2 + segmentWidth * (i + 0.5), 0, 0.012),
+            safeCenter +
+                vm.Vector3(
+                  -this.width / 2 + segmentWidth * (i + 0.5),
+                  0,
+                  0.012,
+                ),
           ),
       );
     }
-    initSpatial(center, mode: placementMode);
+    initSpatial(safeCenter, mode: placementMode);
     applyEmissive();
   }
 
@@ -88,14 +104,14 @@ class VrProgressBar3D extends VrControl {
   final List<Node> _segmentNodes = [];
   final List<PhysicallyBasedMaterial> _segmentMaterials = [];
 
-  int get filledSegments => (value * segments).round();
+  int get filledSegments => (_clamp01(value) * segments).round();
 
   List<PhysicallyBasedMaterial> get debugSegmentMaterials =>
       List.unmodifiable(_segmentMaterials);
 
   /// Updates progress without firing [onPressed].
   void setValue(double nextValue) {
-    value = nextValue.clamp(0.0, 1.0);
+    value = _clamp01(nextValue);
     applyEmissive();
   }
 
@@ -107,7 +123,9 @@ class VrProgressBar3D extends VrControl {
 
   @override
   String get label {
-    final formatted = valueFormat?.call(value) ?? '${(value * 100).round()}%';
+    final safeVal = _clamp01(value);
+    final formatted =
+        valueFormat?.call(safeVal) ?? '${(safeVal * 100).round()}%';
     return '$baseLabel: $formatted';
   }
 

@@ -8,35 +8,47 @@ import 'vr_control.dart';
 
 /// A gaze-interactive segmented slider (the VR counterpart of `Slider`).
 class VrSlider3D extends VrControl {
+  static double _clamp01(double v) => !v.isFinite ? 0.0 : v.clamp(0.0, 1.0);
+
   VrSlider3D({
     required super.name,
     required super.label,
     required vm.Vector3 center,
-    this.divisions = VrWidgetConstants.sliderDefaultDivisions,
+    int divisions = VrWidgetConstants.sliderDefaultDivisions,
     double initialValue = VrWidgetConstants.sliderDefaultInitialValue,
     this.onChanged,
     this.valueFormat,
     this.meshBuilder,
-    this.width = VrWidgetConstants.sliderDefaultWidth,
+    double width = VrWidgetConstants.sliderDefaultWidth,
     VrPlacementMode placementMode = VrPlacementMode.staticWorld,
   }) : assert(divisions >= 2, 'a slider needs at least 2 divisions'),
-       value = initialValue.clamp(0.0, 1.0) {
+       divisions = !divisions.isFinite || divisions < 2
+           ? 2
+           : (divisions > 1024 ? 1024 : divisions),
+       width = !width.isFinite || width <= 0
+           ? VrWidgetConstants.sliderDefaultWidth
+           : width,
+       value = _clamp01(initialValue) {
+    final safeCenter =
+        center.x.isFinite && center.y.isFinite && center.z.isFinite
+        ? center
+        : vm.Vector3.zero();
     _trackMat = controlMaterial(vm.Vector4(0.30, 0.32, 0.40, 1.0));
     _track = Node(
       name: name,
       mesh:
           meshBuilder?.call() ??
           Mesh(
-            VrBeveledBoxGeometry.pill(vm.Vector3(width, 0.035, 0.035)),
+            VrBeveledBoxGeometry.pill(vm.Vector3(this.width, 0.035, 0.035)),
             _trackMat,
           ),
-    )..localTransform = vm.Matrix4.translation(center);
+    )..localTransform = vm.Matrix4.translation(safeCenter);
 
-    for (var i = 0; i < divisions; i++) {
-      final t = i / (divisions - 1);
+    for (var i = 0; i < this.divisions; i++) {
+      final t = i / (this.divisions - 1);
       final mat = controlMaterial(vm.Vector4(0.20, 0.55, 0.70, 1.0));
       _segmentMats.add(mat);
-      _segmentOffsets.add(vm.Vector3((t - 0.5) * width, 0, 0.012));
+      _segmentOffsets.add(vm.Vector3((t - 0.5) * this.width, 0, 0.012));
       _segments.add(
         Node(
           name: '$_segmentPrefix$i',
@@ -44,11 +56,13 @@ class VrSlider3D extends VrControl {
               meshBuilder?.call() ??
               Mesh(
                 VrBeveledBoxGeometry.pill(
-                  vm.Vector3(width / (divisions + 2), 0.05, 0.02),
+                  vm.Vector3(this.width / (this.divisions + 2), 0.05, 0.02),
                 ),
                 mat,
               ),
-        )..localTransform = vm.Matrix4.translation(center + _segmentOffsets[i]),
+        )..localTransform = vm.Matrix4.translation(
+          safeCenter + _segmentOffsets[i],
+        ),
       );
     }
 
@@ -59,7 +73,7 @@ class VrSlider3D extends VrControl {
           meshBuilder?.call() ?? Mesh(SphereGeometry(radius: 0.05), _thumbMat),
     );
     _placeThumb();
-    initSpatial(center, mode: placementMode);
+    initSpatial(safeCenter, mode: placementMode);
   }
 
   /// Number of selectable steps (≥ 2).
@@ -98,7 +112,7 @@ class VrSlider3D extends VrControl {
   /// Programmatic set (e.g. loading a saved configuration): moves the
   /// thumb and refreshes emissive WITHOUT firing [onChanged].
   void setValue(double v) {
-    value = v.clamp(0.0, 1.0);
+    value = _clamp01(v);
     _placeThumb();
     applyEmissive();
   }
@@ -115,7 +129,9 @@ class VrSlider3D extends VrControl {
   /// HUD label includes the formatted value.
   @override
   String get label {
-    final formatted = valueFormat?.call(value) ?? '${(value * 100).round()}%';
+    final safeVal = _clamp01(value);
+    final formatted =
+        valueFormat?.call(safeVal) ?? '${(safeVal * 100).round()}%';
     return '$baseLabel: $formatted';
   }
 
@@ -133,7 +149,10 @@ class VrSlider3D extends VrControl {
   }
 
   /// The value a segment index maps to.
-  double valueForSegment(int i) => i / (divisions - 1);
+  double valueForSegment(int i) {
+    final safeIdx = !i.isFinite ? 0 : i.clamp(0, divisions - 1);
+    return safeIdx / (divisions - 1);
+  }
 
   @override
   void applyEmissive() {
@@ -168,8 +187,14 @@ class VrSlider3D extends VrControl {
   @override
   void onHoverEnter(String nodeName) {
     if (nodeName.startsWith(_segmentPrefix)) {
-      _hoveredSegment = int.parse(nodeName.substring(_segmentPrefix.length));
-      _hovered = false;
+      final parsed = int.tryParse(nodeName.substring(_segmentPrefix.length));
+      if (parsed != null && parsed >= 0 && parsed < divisions) {
+        _hoveredSegment = parsed;
+        _hovered = false;
+      } else {
+        _hoveredSegment = -1;
+        _hovered = false;
+      }
     } else {
       _hoveredSegment = -1;
       _hovered = true;
@@ -187,7 +212,8 @@ class VrSlider3D extends VrControl {
   @override
   void onSelect(String nodeName) {
     if (nodeName.startsWith(_segmentPrefix)) {
-      final i = int.parse(nodeName.substring(_segmentPrefix.length));
+      final i = int.tryParse(nodeName.substring(_segmentPrefix.length));
+      if (i == null || i < 0 || i >= divisions) return;
       value = valueForSegment(i);
       _placeThumb();
       flash();

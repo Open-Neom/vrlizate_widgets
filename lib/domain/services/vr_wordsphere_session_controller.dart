@@ -48,27 +48,43 @@ class VrWordsphereSessionController {
     required double dt,
     bool pointerActive = false,
   }) {
-    final hasStickInput =
-        stickX.abs() > stickDeadzone || stickY.abs() > stickDeadzone;
+    final safeBaseSize = baseSize.isFinite && baseSize > 0
+        ? baseSize
+        : VrWordsphereConstants.defaultBaseSizeTexels;
+    final safeDeadzone = stickDeadzone.isFinite && stickDeadzone >= 0
+        ? stickDeadzone.clamp(0.0, 0.99)
+        : VrWordsphereConstants.defaultStickDeadzone;
+    final safeSpeed = stickSpeed.isFinite && stickSpeed >= 0
+        ? stickSpeed
+        : VrWordsphereConstants.defaultStickSpeed;
+    final sx = stickX.isFinite ? stickX.clamp(-1.0, 1.0) : 0.0;
+    final sy = stickY.isFinite ? stickY.clamp(-1.0, 1.0) : 0.0;
+
+    final hasStickInput = sx.abs() > safeDeadzone || sy.abs() > safeDeadzone;
     if (hasStickInput && !pointerActive) {
       if (!_stickAim) {
-        final initialGaze = plane.intersect(ray, baseSize: baseSize);
+        final initialGaze = plane.intersect(ray, baseSize: safeBaseSize);
         if (initialGaze != null) _stickPoint = initialGaze;
       }
       _stickAim = true;
     }
 
     if (_stickAim && !pointerActive && dt.isFinite && dt > 0) {
-      final x = stickX.abs() > stickDeadzone ? stickX : 0.0;
-      final y = stickY.abs() > stickDeadzone ? stickY : 0.0;
+      final x = sx.abs() > safeDeadzone ? sx : 0.0;
+      final y = sy.abs() > safeDeadzone ? sy : 0.0;
       final scale =
-          stickSpeed * dt.clamp(0.0, 0.1) / math.max(1.0, math.sqrt(x * x + y * y));
-      final half = baseSize / 2;
-      var px = _stickPoint.dx - half + x * scale;
-      var py = _stickPoint.dy - half - y * scale;
+          safeSpeed *
+          dt.clamp(0.0, 0.1) /
+          math.max(1.0, math.sqrt(x * x + y * y));
+      final half = safeBaseSize / 2;
+      final prevX = _stickPoint.dx.isFinite ? _stickPoint.dx : half;
+      final prevY = _stickPoint.dy.isFinite ? _stickPoint.dy : half;
+      var px = prevX - half + x * scale;
+      var py = prevY - half - y * scale;
       final radius = math.sqrt(px * px + py * py);
-      final limit = baseSize * VrWordsphereConstants.maxCursorRadiusNormalized;
-      if (radius > limit) {
+      final limit =
+          safeBaseSize * VrWordsphereConstants.maxCursorRadiusNormalized;
+      if (radius > limit && radius > 0) {
         px *= limit / radius;
         py *= limit / radius;
       }
@@ -76,12 +92,12 @@ class VrWordsphereSessionController {
     }
 
     if (pointerActive) {
-      return plane.intersect(ray, baseSize: baseSize);
+      return plane.intersect(ray, baseSize: safeBaseSize);
     }
     if (_stickAim) {
       return _stickPoint;
     }
-    return plane.intersect(ray, baseSize: baseSize);
+    return plane.intersect(ray, baseSize: safeBaseSize);
   }
 
   /// Toggles deliberate controller tracing (Button X / A).
